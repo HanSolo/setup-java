@@ -241,7 +241,7 @@ async function getDownloadInfo(
     if (version.endsWith('.x')) {
       version = version.slice(0, -2);
       latest = 'per_version';
-  } else {
+    } else {
       version = version.slice(0, -1);
       latest = 'overall';
     }
@@ -253,19 +253,19 @@ async function getDownloadInfo(
     version.includes('ea')
   ) {
     latest = 'overall';
-    }
+  }
 
   let url = DISCO_URL + PACKAGES_PATH;
   url += '?distro=' + distribution;
   if (version.length != 0) {
     url += '&version=' + version;
-    }
+  }
   if (javaPackage === 'jdk+fx') {
     url += '&package_type=jdk';
     url += '&javafx_bundled=true';
   } else {
     url += '&package_type=' + packageType;
-    }
+  }
   url += '&release_status=ea';
   url += '&release_status=ga';
   url += '&architecture=' + architecture;
@@ -296,7 +296,7 @@ async function getDownloadInfo(
       ' when retrieving versions from ' +
       url;
     throw new Error(message);
-    }
+  }
 
   // Choose the most recent satisfying version
   let curVersion = '0.0.0';
@@ -336,6 +336,6 @@ async function getPackageFileUrl(ephemeralId: string) {
     }
     const message = `Unexpected HTTP status code '${response.message.statusCode}' when retrieving versions from '${url}'. ${body}`.trim();
     throw new Error(message);
-    }
+  }
   return '';
 }
