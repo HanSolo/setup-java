@@ -192,7 +192,7 @@ async function getDownloadInfo(
   version: string,
   arch: string,
   javaPackage: string,
-  distro: string
+  distro: string = 'zulu'
 ): Promise<{version: string; url: string}> {
   const architecture = arch === 'x86' ? 'i686' : 'x64';
   let operatingSystem = '';
@@ -216,7 +216,7 @@ async function getDownloadInfo(
       distribution = distro.toLowerCase();
     } else {
       throw new Error(
-        `distro argument '${distro}' is not in [aoj | aoj_openj9 | corretto | dragonwell | liberica | ojdk_build | oracle_open_jdk | sap_machine | zulu]`
+        `distro argument '${distro}' is not in [aoj | aoj_openj9 | corretto | dragonwell | liberica | ojdk_build | oracle_openjdk | sap_machine | trava | zulu]`
       );
     }
   } else {
@@ -236,25 +236,6 @@ async function getDownloadInfo(
     }
   }
 
-  let latest = 'explicit';
-  if (version.endsWith('x')) {
-    if (version.endsWith('.x')) {
-      version = version.slice(0, -2);
-      latest = 'per_version';
-    } else {
-      version = version.slice(0, -1);
-      latest = 'overall';
-    }
-  }
-  if (
-    version.endsWith('0') ||
-    version.length === 1 ||
-    version.length === 2 ||
-    version.includes('ea')
-  ) {
-    latest = 'overall';
-  }
-
   let url = DISCO_URL + PACKAGES_PATH;
   url += '?distro=' + distribution;
   if (version.length != 0) {
@@ -266,12 +247,16 @@ async function getDownloadInfo(
   } else {
     url += '&package_type=' + packageType;
   }
-  url += '&release_status=ea';
+  if (version.includes('ea')) {
+    url += '&release_status=ea';
+  }
   url += '&release_status=ga';
   url += '&architecture=' + architecture;
   url += '&operating_system=' + operatingSystem;
   url += '&archive_type=' + archiveType;
-  url += '&latest=' + latest;
+  if (version.includes('x') || version.includes('ea')) {
+    url += '&latest=overall';
+  }
 
   const http = new httpm.HttpClient('bundles', undefined, {
     allowRetries: true,

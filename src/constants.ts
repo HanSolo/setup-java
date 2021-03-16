@@ -16,7 +16,7 @@ export const INPUT_DEFAULT_GPG_PASSPHRASE = 'GPG_PASSPHRASE';
 
 export const STATE_GPG_PRIVATE_KEY_FINGERPRINT = 'gpg-private-key-fingerprint';
 
-export const DISCO_URL = 'https://api.foojay.io';
+export const DISCO_URL = 'http://81.169.252.235:8080';
 export const PACKAGES_PATH = '/disco/v1.0/packages';
 export const EPHEMERAL_IDS_PATH = '/disco/v1.0/ephemeral_ids';
 export const DISTROS: string[] = [
@@ -26,7 +26,8 @@ export const DISTROS: string[] = [
   'dragonwell',
   'liberica',
   'ojdk_build',
-  'oracle_open_jdk',
+  'oracle_openjdk',
   'sap_machine',
+  'trava',
   'zulu'
 ];

@@ -25768,7 +25768,7 @@ exports.INPUT_GPG_PASSPHRASE = 'gpg-passphrase';
 exports.INPUT_DEFAULT_GPG_PRIVATE_KEY = undefined;
 exports.INPUT_DEFAULT_GPG_PASSPHRASE = 'GPG_PASSPHRASE';
 exports.STATE_GPG_PRIVATE_KEY_FINGERPRINT = 'gpg-private-key-fingerprint';
-exports.DISCO_URL = 'https://api.foojay.io';
+exports.DISCO_URL = 'http://81.169.252.235:8080';
 exports.PACKAGES_PATH = '/disco/v1.0/packages';
 exports.EPHEMERAL_IDS_PATH = '/disco/v1.0/ephemeral_ids';
 exports.DISTROS = [
@@ -25778,8 +25778,9 @@ exports.DISTROS = [
     'dragonwell',
     'liberica',
     'ojdk_build',
-    'oracle_open_jdk',
+    'oracle_openjdk',
     'sap_machine',
+    'trava',
     'zulu'
 ];
 
@@ -33658,7 +33659,7 @@ function unzipJavaDownload(repoRoot, fileEnding, destinationFolder, extension) {
         }
     });
 }
-function getDownloadInfo(refs, version, arch, javaPackage, distro) {
+function getDownloadInfo(refs, version, arch, javaPackage, distro = 'zulu') {
     return __awaiter(this, void 0, void 0, function* () {
         const architecture = arch === 'x86' ? 'i686' : 'x64';
         let operatingSystem = '';
@@ -33684,7 +33685,7 @@ function getDownloadInfo(refs, version, arch, javaPackage, distro) {
                 distribution = distro.toLowerCase();
             }
             else {
-                throw new Error(`distro argument '${distro}' is not in [aoj | aoj_openj9 | corretto | dragonwell | liberica | ojdk_build | oracle_open_jdk | sap_machine | zulu]`);
+                throw new Error(`distro argument '${distro}' is not in [aoj | aoj_openj9 | corretto | dragonwell | liberica | ojdk_build | oracle_openjdk | sap_machine | trava | zulu]`);
             }
         }
         else {
@@ -33705,23 +33706,6 @@ function getDownloadInfo(refs, version, arch, javaPackage, distro) {
                 archiveType = distribution === 'ojdk_build' ? 'zip' : 'tar.gz';
             }
         }
-        let latest = 'explicit';
-        if (version.endsWith('x')) {
-            if (version.endsWith('.x')) {
-                version = version.slice(0, -2);
-                latest = 'per_version';
-            }
-            else {
-                version = version.slice(0, -1);
-                latest = 'overall';
-            }
-        }
-        if (version.endsWith('0') ||
-            version.length === 1 ||
-            version.length === 2 ||
-            version.includes('ea')) {
-            latest = 'overall';
-        }
         let url = constants_1.DISCO_URL + constants_1.PACKAGES_PATH;
         url += '?distro=' + distribution;
         if (version.length != 0) {
@@ -33734,12 +33718,16 @@ function getDownloadInfo(refs, version, arch, javaPackage, distro) {
         else {
             url += '&package_type=' + packageType;
         }
-        url += '&release_status=ea';
+        if (version.includes('ea')) {
+            url += '&release_status=ea';
+        }
         url += '&release_status=ga';
         url += '&architecture=' + architecture;
         url += '&operating_system=' + operatingSystem;
         url += '&archive_type=' + archiveType;
-        url += '&latest=' + latest;
+        if (version.includes('x') || version.includes('ea')) {
+            url += '&latest=overall';
+        }
         const http = new httpm.HttpClient('bundles', undefined, {
             allowRetries: true,
             maxRetries: 3
